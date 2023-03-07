@@ -1,1 +1,178 @@
-public static void main(String[] args){}
+import java.util.Scanner;
+public class Battleship {
+	//Board declaration
+	public static String[][] board1 = new String[10][10];
+	public static String[][] board2 = new String[10][10];
+	public static String[][] board1hidden = new String[10][10];
+	public static String[][] board2hidden = new String[10][10];
+	
+	//Creates Letter array we use to iterate through later
+	public static char letterarray[] = new char[] {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+	//Win Condition, if this is satisfied, the game ends
+	public static boolean  winconditionnotpresent (String [][] Rboard) {
+		for (int i = 0; i < Rboard.length; i++) {
+			for (int j = 0; j < Rboard.length; j++) {
+				if (Rboard[i][j] == "O ") {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	//If win condition is present, this prints the corresponding winning player in the console
+	public static void windeclaration(String[][] RBoard2, String[][]RBoard1) {
+		if (winconditionnotpresent(RBoard1) == false){
+			System.out.println("Player 1 Wins!");
+		}
+		else {
+			System.out.println("Player 2 Wins!");
+		}
+	}
+	
+	//Creates a 2D String array, which we can search for unhit ships for our win conditions
+	public static void fillboard(String [][] board) {
+		for (int row = 0; row < board.length; row++) {
+			for(int column = 0; column < board.length; column++) {
+				board[row][column] = "_|";
+			}
+		}
+	}
+	//Displays whatever board is passed as a parameter to the players in the console
+	public static void printboard(String [][] board) {
+		System.out.println("    A  B  C  D  E  F  G  H  I  J");
+        System.out.println("   -----------------------------");
+        for (int i = 0; i < (board.length); i++) {
+        	if (i<9) {
+        		System.out.print(" " + (i+1) + "| ");
+        		for (int j = 0; j < board.length; j++) {
+        			System.out.print(board[i][j] + " ");
+        		}
+        		System.out.println("");
+        	}
+        	else {
+        		System.out.print((i+1) + "|");
+        		for (int j = 0; j < board.length; j++) {
+        			System.out.print(" "+ board[i][j]);
+        		}
+        		System.out.println("");
+        	}
+        }
+	}
+	//Allows player to place ships with format "Ship length (int), Vertical or Horizontal (char), Corresponding left or top square (String)" 
+	//Ex. 3HA4 corresponds to a ship of length 3 oriented horizontally from squares A4 to C4
+	public static void placeShips(String [][] board) {
+		Scanner Shipdetails= new Scanner(System.in);
+		System.out.println("What is the length of your ship? ");
+		System.out.println("Will You Orient this ship Vertically(V) or Horizontally(H)? ");
+		System.out.println("Which Square is your Left/Top Square?");
+		String Details = Shipdetails.nextLine();
+		char[] DetailArray = Details.toCharArray();
+		int shiplength = Character.getNumericValue(DetailArray[0]);
+		int counter = 0;
+		while (DetailArray[2] != letterarray[counter]) {
+			counter += 1;
+		}
+		int pointwidth = counter;
+		counter = 0;
+		int pointheight = 9;
+		try {
+			char[]testchar = DetailArray;
+			testchar[4] = '0';
+		}
+		catch(ArrayIndexOutOfBoundsException e) {
+			pointheight = Character.getNumericValue(DetailArray[3]) - 1;
+		}
+		for (int i = 0; i < shiplength; i++) {
+			if (DetailArray[1] == 'H') {
+				board[pointheight][pointwidth + i] = "O ";
+			}
+			else {
+				board[pointheight+i][pointwidth] = "O ";
+			}
+		}
+	}
+	//lets players alternate, taking turns until one player's win condition is present
+	public static void PlayerTurns(String [][] p1actual, String [][] p2actual, String [][] p1view, String [][] p2view) {
+		while (winconditionnotpresent(board1) && winconditionnotpresent(board2)) {
+			Scanner squareselect = new Scanner(System.in);
+			System.out.println("Player 1, where would you like to strike?");
+			String square = squareselect.nextLine();
+			char[] squareArray = square.toCharArray();
+			int xvalue = 10;
+			try {
+				char[]testchar = squareArray;
+				testchar[2] = '0';
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				xvalue = Character.getNumericValue(squareArray[1]);;
+			}
+			int counter2 = 0;
+			while (squareArray[0] != letterarray[counter2]) {
+				counter2 += 1;
+			}
+			int yvalue = counter2;
+			if (p2actual[xvalue-1][yvalue] == "O ") {
+				p2actual[xvalue-1][yvalue] = "X ";
+				p2view[xvalue-1][yvalue] = "X ";
+				printboard(p2view);
+			}
+			else {
+				p2actual[xvalue-1][yvalue] = "- ";
+				p2view[xvalue-1][yvalue] = "- ";
+				printboard(p2view);
+			}
+			Scanner squareselect2 = new Scanner(System.in);
+			System.out.println("Player 2, where would you like to strike?");
+			String square2 = squareselect2.nextLine();
+			char[] squareArray2 = square2.toCharArray();
+			int xvalue2 = 10;
+			try {
+				char[]testchar = squareArray;
+				testchar[2] = '0';
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				xvalue2 = Character.getNumericValue(squareArray2[1]);
+			}
+			int counter = 0;
+			while (squareArray2[0] != letterarray[counter]) {
+				counter += 1;
+			}
+			int yvalue2 = counter;
+			if (p1actual[xvalue2-1][yvalue2] == "O ") {
+				p1actual[xvalue2-1][yvalue2] = "X ";
+				p1view[xvalue2-1][yvalue2] = "X ";
+				printboard(p1view);
+			}
+			else {
+				p1actual[xvalue2-1][yvalue2] = "- ";
+				p1view[xvalue2-1][yvalue2] = "- ";
+				printboard(p1view);
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		fillboard(board1);
+		fillboard(board2);
+		fillboard(board1hidden);
+		fillboard(board2hidden);
+		System.out.println("Player 1 place your ships");
+		System.out.println("Place 3 ships, one of length 3, one of length 4, and one of length 5");
+		placeShips(board1);
+		printboard(board1);
+		placeShips(board1);
+		printboard(board1);
+		placeShips(board1);
+		printboard(board1);
+		System.out.println("Player 2 place your ships");
+		System.out.println("Place 3 ships, one of length 3, one of length 4, and one of length 5");
+		placeShips(board2);
+		printboard(board2);
+		placeShips(board2);
+		printboard(board2);
+		placeShips(board2);
+		printboard(board2);
+		PlayerTurns(board1, board2, board1hidden, board2hidden);
+		windeclaration(board1, board2);
+	}
+}
